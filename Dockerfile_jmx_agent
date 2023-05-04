@@ -1,0 +1,7 @@
+FROM amazoncorretto:8-alpine-jre
+
+RUN apk --no-cache add socat
+
+WORKDIR /opt/jmxquery
+
+ADD JMXQuery-0.1.8.jar /opt/jmxquery/jmxquery-0.6.0/jmxquery/JMXQuery-0.1.8.jar

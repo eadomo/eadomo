@@ -1,0 +1,26 @@
+[MASTER]
+init-hook='import sys; sys.path.extend(["./checkers", "./utils"])'
+
+[FORMAT]
+max-line-length=120
+
+[DESIGN]
+max-args=15
+max-locals=30
+max-branches=30
+max-statements=80
+max-attributes=20
+max-returns=12
+
+[ELIF]
+max-nested-blocks=15
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    logging-fstring-interpolation,
+    logging-not-lazy,
+    attribute-defined-outside-init # pylint bug? complains if attribute is defined in the super class

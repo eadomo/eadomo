@@ -1,0 +1,16 @@
+docker
+pyyaml
+python-dateutil
+requests
+flask>=2.2,<2.3
+flask-cors
+Flask-Session
+waitress
+pymongo
+jmxquery
+slack_sdk
+paramiko
+pyOpenSSL
+mergedeep
+jsonschema
+pylint

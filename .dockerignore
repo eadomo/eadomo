@@ -1,0 +1,7 @@
+**/.git
+**/.yml
+**/.idea
+.gitignore
+Dockerfile
+.gitlab-ci.yml
+*.yml
