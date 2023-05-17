@@ -25,12 +25,12 @@ export default function EnvVarsWindow(props) {
 
     const getEnvVarName = (x) => {
         const eqPos = x.indexOf('=')
-        return x.substr(0, eqPos)
+        return (eqPos != -1) ? x.substr(0, eqPos) : x
     }
 
     const getEnvVarValue = (x) => {
         const eqPos = x.indexOf('=')
-        return x.substr(eqPos+1)
+        return (eqPos != -1) ? x.substr(eqPos+1) : ''
     }
 
     if (envVars)
