@@ -4,8 +4,12 @@ import datetime
 import json
 import logging
 import os
+import shlex
 import sys
+import tarfile
+import tempfile
 import threading
+import base64
 
 import time
 import traceback
@@ -15,6 +19,7 @@ from json import JSONEncoder
 
 import docker
 import docker.errors
+from docker.models.containers import Container
 
 from pymongo import MongoClient
 
@@ -613,6 +618,143 @@ def get_container_env(container):
         cont = client.containers.get(container)
         env = cont.attrs['Config']['Env']
         return env
+    except docker.errors.NotFound:
+        abort(404)
+    except docker.errors.APIError:
+        abort(500)
+
+
+def get_container_file_stat_internal(cont: Container, path: str):
+    # not supported directly by the module - some hacking required
+    url = cont.client.api._url('/containers/{0}/archive', cont.id)
+    response = cont.client.api.head(url, params={'path': path})
+    stat_hdr = response.headers.get('X-Docker-Container-Path-Stat')
+    if stat_hdr:
+        fstat = base64.b64decode(stat_hdr.encode())
+        fstat = json.loads(fstat)
+        return fstat
+    else:
+        return None
+
+
+@bp.route("/container/<container>/ls")
+@admin_required
+def ls_fs_container(container):
+    try:
+        client = main_instance.get_docker_client_by_container_id(container)
+        cont: Container = client.containers.get(container)
+        path = request.args.get('path', default='/', type=str)
+        path = shlex.quote(path)
+        (exit_code, output) = cont.exec_run('ls -p '+path)
+        if exit_code != 0:
+            abort(500)
+        file_list: list[str] = output.decode('utf-8').split("\n")
+        file_desc_objects = []
+        for file_name in file_list:
+            if not file_name:
+                continue
+            if file_name.endswith('/'):
+                file_name = file_name[0:-1]
+                file_type = 'd'
+            else:
+                file_type = 'f'
+            file_desc_objects.append(
+                {
+                    'filename': file_name,
+                    'filetype': file_type,
+                    'stat': get_container_file_stat_internal(cont, file_name)
+                }
+            )
+        return file_desc_objects
+    except docker.errors.NotFound:
+        abort(404)
+    except docker.errors.APIError:
+        abort(500)
+
+
+@bp.route("/container/<container>/getfilestat")
+@admin_required
+def get_container_file_stat(container):
+    try:
+        client = main_instance.get_docker_client_by_container_id(container)
+        cont: Container = client.containers.get(container)
+        path = request.args.get('path', type=str)
+        path = shlex.quote(path)
+
+        return get_container_file_stat_internal(cont, path)
+    except docker.errors.NotFound:
+        abort(404)
+    except docker.errors.APIError:
+        abort(500)
+
+
+@bp.route("/container/<container>/getfile")
+@admin_required
+def get_container_file(container):
+    try:
+        client = main_instance.get_docker_client_by_container_id(container)
+        cont: Container = client.containers.get(container)
+        path = request.args.get('path', type=str)
+        path = shlex.quote(path)
+        bits, stat = cont.get_archive(path)
+        with tempfile.TemporaryFile() as fp:
+            for chunk in bits:
+                fp.write(chunk)
+            fp.seek(0)
+            tf = tarfile.open(fileobj=fp)
+            members = tf.getmembers()
+            f = tf.extractfile(members[0])
+            data = f.read()
+            return Response(data, mimetype='application/octet-stream')
+    except docker.errors.NotFound:
+        abort(404)
+    except docker.errors.APIError:
+        abort(500)
+
+
+# test: curl -v -F 'file=@file' "http://localhost:5555/dashboard/container/mycont/putfile?path=/path/file"
+@bp.route("/container/<container>/putfile", methods=['POST'])
+@admin_required
+def put_container_file(container):
+    upl_obj = request.files['file']
+
+    try:
+        client = main_instance.get_docker_client_by_container_id(container)
+        cont: Container = client.containers.get(container)
+        path = request.args.get('path', type=str)
+        path = shlex.quote(path)
+
+        orig_tarinfo = None
+        bits, stat = cont.get_archive(path)
+        with tempfile.TemporaryFile() as fp:
+            for chunk in bits:
+                fp.write(chunk)
+            fp.seek(0)
+            tf = tarfile.open(fileobj=fp)
+            members = tf.getmembers()
+            if len(members) > 0:
+                orig_tarinfo = members[0]
+
+        with tempfile.TemporaryFile() as uploaded_file:
+            upl_obj.save(uploaded_file)
+            uploaded_file.seek(0)
+
+            with tempfile.TemporaryFile() as fp:
+                tf = tarfile.open(fileobj=fp, mode='w')
+                tarinfo = tf.gettarinfo(fileobj=uploaded_file, arcname=path)
+                if orig_tarinfo:
+                    tarinfo.mode = orig_tarinfo.mode
+                    tarinfo.uid = orig_tarinfo.uid
+                    tarinfo.gid = orig_tarinfo.gid
+                uploaded_file.seek(0)
+                tf.addfile(tarinfo, uploaded_file)
+                tf.close()
+
+                fp.seek(0)
+                data = fp.read()
+
+                cont.put_archive('/', data)
+        return '', 204
     except docker.errors.NotFound:
         abort(404)
     except docker.errors.APIError:
