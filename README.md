@@ -162,80 +162,81 @@ You can use several files passing them all as command line arguments to `eadomo.
 all files found in this directory will be interpreted as configuration file.
 You can also set environment variable `EADOMO_CONFIGURATION` with the content of a configuration file.
 
-| L1           | L2                  | L3            | L4        | L5       | Description                                                    | Mandatory | Default               |
-|:-------------|:--------------------|:--------------|-----------|----------|:---------------------------------------------------------------|-----------|-----------------------|
-| name         |                     |               |           |          | Name of the deployment                                         |           |                       |
-| enabled      |                     |               |           |          | `true` if this configuration file is enabled                   |           | true                  |
-| dockers      |                     |               |           |          | List of dockers to use                                         |           |                       |
-|              | id                  |               |           |          | Identifier                                                     | ✓         |                       |
-|              | url                 |               |           |          | Docker Url<br/>Can be also unix:/// or ssh://                  | ✓         |                       |
-|              | default             |               |           |          | Set to true if it's the default docker (use only once)         |           |                       |
-| blueprint    |                     |               |           |          | Container layout                                               |           |                       |
-| *list of ->* | name                |               |           |          | Container name                                                 | ✓         |                       |
-|              | docker              |               |           |          | Identifier of docker to use                                    |           | Default docker client |
-|              | friendly-name       |               |           |          | Container friendly name                                        |           |                       |
-|              | desc                |               |           |          | Description                                                    |           |                       |
-|              | panel               |               |           |          | Link to control panel or a service                             |           |                       |
-|              | ports               |               |           |          | List of ports to check                                         |           |                       | 
-|              | disk-free           |               |           |          | Disk free checks (overriding defaults)                         |           |                       | 
-|              |                     | mount         |           |          | Mount point                                                    | ✓         |                       |
-|              |                     | threshold     |           |          | Disk usage threshold in %                                      | ✓         |                       |
-|              | image-update-check  |               |           |          | Check registry to image updates                                |           |                       |
-|              |                     | username      |           |          | Registry username                                              | ✓         |                       |
-|              |                     | password      |           |          | Registry password                                              | ✓         |                       |
-|              | gitlab-update-check |               |           |          | Check GitLab for new commits                                   |           |                       |
-|              |                     | url           |           |          | GitLab URL                                                     | ✓         |                       |
-|              |                     | token         |           |          | GitLab private token for API access                            | ✓         |                       |
-|              |                     | project-id    |           |          | GitLab project id                                              | ✓         |                       |
-|              |                     | dev-branch    |           |          | Development branch                                             | ✓         |                       |
-|              |                     | deploy-branch |           |          | Deployment branch                                              | ✓         |                       |
-| jmx          |                     |               |           |          | JMX monitoring of Java services                                |           |                       |
-| *list of ->* | service             |               |           |          | Name of the service                                            | ✓         |                       |
-|              | panel               |               |           |          | Link to control panel                                          |           |                       |
-|              | docker              |               |           |          | Identifier of docker to use                                    |           | Default docker client |
-|              | url                 |               |           |          | Service locator                                                |           |                       |
-|              |                     | docker        |           |          | Use to located service in a docker container                   |           |                       |
-|              |                     |               | container |          | Name of the container                                          |           |                       |
-|              |                     |               | port      |          | JMX port                                                       |           |                       |
-| services     |                     |               |           |          | Services layout                                                |           |                       |
-| *list of ->* | name                |               |           |          | Service name                                                   |           |                       |
-|              | hostname            |               |           |          | Hostname                                                       |           |                       |
-|              | panel               |               |           |          | Link to control panel                                          |           |                       |
-|              | docker              |               |           |          | Identifier of docker to use                                    |           | Default docker client |
-|              | endpoints           |               |           |          | Endpoints to check                                             |           |                       |
-| *list of ->* |                     | url           |           |          | Endpoint URL                                                   | ✓         |                       |
-|              |                     | type          |           |          | Check type: direct (from host) or docker                       |           | docker                |
-|              |                     | method        |           |          | Access method (GET, POST, etc.)                                |           | GET                   |
-|              |                     | data          |           |          | Data to send to the server (POST and PUT only)                 |           |                       |
-| *list of ->* |                     | exp_code      |           |          | Expected HTTP return code                                      |           | 200                   |
-|              |                     | auth          |           |          | Authentication                                                 |           |                       |
-|              |                     |               | basic     |          | Basic authentication                                           |           |                       |
-|              |                     |               |           | username | Username                                                       | ✓         |                       |
-|              |                     |               |           | password | Password                                                       | ✓         |                       |
-|              | zabbix              |               |           |          | Zabbix configuration                                           |           |                       |
-|              |                     | disk-free     |           |          | Disk free checks                                               |           |                       | 
-|              |                     |               | mount     |          | Mount point                                                    | ✓         |                       |
-|              |                     |               | threshold |          | Disk usage threshold in %                                      | ✓         |                       |
-|              |                     | mount-points  |           |          | List of mount points to monitor (if default threshold is used) |           |                       |
-|              |                     | ports         |           |          | List of ports to check                                         |           |                       | 
-|              |                     | nic           |           |          | List of network interfaces to monitor                          |           |                       | 
-| actions      |                     |               |           |          | Actions which can be executed from the UI                      |           |                       | 
-| *list of ->* | name                |               |           |          | Action name                                                    |           |                       | 
-|              | id                  |               |           |          | Action identifier (to be used in the URL)                      |           |                       | 
-|              | docker              |               |           |          | Identifier of docker to user                                   |           | Default docker client |
-|              | icon                |               |           |          | Action icon                                                    |           |                       | 
-|              | image               |               |           |          | Docker image to run in                                         |           |                       | 
-|              | working_dir         |               |           |          | Working directory                                              |           |                       | 
-|              | environment         |               |           |          | List of environment variables                                  |           |                       | 
-|              | volumes             |               |           |          | Volumes to mount                                               |           |                       | 
-|              | volumes_from        |               |           |          | Mount volumes from another container                           |           |                       | 
-|              | network             |               |           |          | Docker network                                                 |           |                       | 
-|              | network_mode        |               |           |          | Docker network mode                                            |           |                       | 
-|              | privileged          |               |           |          | Privileged mode                                                |           |                       | 
-|              | user                |               |           |          | User to run as                                                 |           |                       | 
-|              | command             |               |           |          | Command to execute                                             |           |                       | 
-|              | artifacts           |               |           |          | List of artifacts to send to the user after actions completion |           |                       | 
-| readme       |                     |               |           |          | Text to shown in the Read me tab                               |           |                       | 
+| L1           | L2                  | L3                | L4        | L5       | Description                                                    | Mandatory | Default               |
+|:-------------|:--------------------|:------------------|-----------|----------|:---------------------------------------------------------------|-----------|-----------------------|
+| name         |                     |                   |           |          | Name of the deployment                                         |           |                       |
+| enabled      |                     |                   |           |          | `true` if this configuration file is enabled                   |           | true                  |
+| dockers      |                     |                   |           |          | List of dockers to use                                         |           |                       |
+|              | id                  |                   |           |          | Identifier                                                     | ✓         |                       |
+|              | url                 |                   |           |          | Docker Url<br/>Can be also unix:/// or ssh://                  | ✓         |                       |
+|              | default             |                   |           |          | Set to true if it's the default docker (use only once)         |           |                       |
+| blueprint    |                     |                   |           |          | Container layout                                               |           |                       |
+| *list of ->* | name                |                   |           |          | Container name                                                 | ✓         |                       |
+|              | docker              |                   |           |          | Identifier of docker to use                                    |           | Default docker client |
+|              | friendly-name       |                   |           |          | Container friendly name                                        |           |                       |
+|              | desc                |                   |           |          | Description                                                    |           |                       |
+|              | panel               |                   |           |          | Link to control panel or a service                             |           |                       |
+|              | ports               |                   |           |          | List of ports to check                                         |           |                       | 
+|              | disk-free           |                   |           |          | Disk free checks (overriding defaults)                         |           |                       | 
+|              |                     | mount             |           |          | Mount point                                                    | ✓         |                       |
+|              |                     | threshold         |           |          | Disk usage threshold in %                                      | ✓         |                       |
+|              | image-update-check  |                   |           |          | Check registry to image updates                                |           |                       |
+|              |                     | username          |           |          | Registry username                                              | ✓         |                       |
+|              |                     | password          |           |          | Registry password                                              | ✓         |                       |
+|              | gitlab-update-check |                   |           |          | Check GitLab for new commits                                   |           |                       |
+|              |                     | url               |           |          | GitLab URL                                                     | ✓         |                       |
+|              |                     | token             |           |          | GitLab private token for API access                            | ✓         |                       |
+|              |                     | project-id        |           |          | GitLab project id                                              | ✓         |                       |
+|              |                     | dev-branch        |           |          | Development branch                                             | ✓         |                       |
+|              |                     | deploy-branch     |           |          | Deployment branch                                              | ✓         |                       |
+| jmx          |                     |                   |           |          | JMX monitoring of Java services                                |           |                       |
+| *list of ->* | service             |                   |           |          | Name of the service                                            | ✓         |                       |
+|              | panel               |                   |           |          | Link to control panel                                          |           |                       |
+|              | docker              |                   |           |          | Identifier of docker to use                                    |           | Default docker client |
+|              | url                 |                   |           |          | Service locator                                                |           |                       |
+|              |                     | docker            |           |          | Use to located service in a docker container                   |           |                       |
+|              |                     |                   | container |          | Name of the container                                          |           |                       |
+|              |                     |                   | port      |          | JMX port                                                       |           |                       |
+| services     |                     |                   |           |          | Services layout                                                |           |                       |
+| *list of ->* | name                |                   |           |          | Service name                                                   |           |                       |
+|              | hostname            |                   |           |          | Hostname                                                       |           |                       |
+|              | panel               |                   |           |          | Link to control panel                                          |           |                       |
+|              | docker              |                   |           |          | Identifier of docker to use                                    |           | Default docker client |
+|              | endpoints           |                   |           |          | Endpoints to check                                             |           |                       |
+| *list of ->* |                     | url               |           |          | Endpoint URL                                                   | ✓         |                       |
+|              |                     | type              |           |          | Check type: direct (from host) or docker                       |           | docker                |
+|              |                     | method            |           |          | Access method (GET, POST, etc.)                                |           | GET                   |
+|              |                     | data              |           |          | Data to send to the server (POST and PUT only)                 |           |                       |
+|              |                     | extra_curl_params |           |          | Additional parameters to pass to cURL                          |           |                       |
+| *list of ->* |                     | exp_code          |           |          | Expected HTTP return code                                      |           | 200                   |
+|              |                     | auth              |           |          | Authentication                                                 |           |                       |
+|              |                     |                   | basic     |          | Basic authentication                                           |           |                       |
+|              |                     |                   |           | username | Username                                                       | ✓         |                       |
+|              |                     |                   |           | password | Password                                                       | ✓         |                       |
+|              | zabbix              |                   |           |          | Zabbix configuration                                           |           |                       |
+|              |                     | disk-free         |           |          | Disk free checks                                               |           |                       | 
+|              |                     |                   | mount     |          | Mount point                                                    | ✓         |                       |
+|              |                     |                   | threshold |          | Disk usage threshold in %                                      | ✓         |                       |
+|              |                     | mount-points      |           |          | List of mount points to monitor (if default threshold is used) |           |                       |
+|              |                     | ports             |           |          | List of ports to check                                         |           |                       | 
+|              |                     | nic               |           |          | List of network interfaces to monitor                          |           |                       | 
+| actions      |                     |                   |           |          | Actions which can be executed from the UI                      |           |                       | 
+| *list of ->* | name                |                   |           |          | Action name                                                    |           |                       | 
+|              | id                  |                   |           |          | Action identifier (to be used in the URL)                      |           |                       | 
+|              | docker              |                   |           |          | Identifier of docker to user                                   |           | Default docker client |
+|              | icon                |                   |           |          | Action icon                                                    |           |                       | 
+|              | image               |                   |           |          | Docker image to run in                                         |           |                       | 
+|              | working_dir         |                   |           |          | Working directory                                              |           |                       | 
+|              | environment         |                   |           |          | List of environment variables                                  |           |                       | 
+|              | volumes             |                   |           |          | Volumes to mount                                               |           |                       | 
+|              | volumes_from        |                   |           |          | Mount volumes from another container                           |           |                       | 
+|              | network             |                   |           |          | Docker network                                                 |           |                       | 
+|              | network_mode        |                   |           |          | Docker network mode                                            |           |                       | 
+|              | privileged          |                   |           |          | Privileged mode                                                |           |                       | 
+|              | user                |                   |           |          | User to run as                                                 |           |                       | 
+|              | command             |                   |           |          | Command to execute                                             |           |                       | 
+|              | artifacts           |                   |           |          | List of artifacts to send to the user after actions completion |           |                       | 
+| readme       |                     |                   |           |          | Text to shown in the Read me tab                               |           |                       | 
 
 ### Sample configuration
 

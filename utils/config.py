@@ -171,6 +171,7 @@ schema = {
                 "url": {"type": "string"},
                 "method": {"type": "string"},
                 "data": {"type": "string"},
+                "extra_curl_params": {"type": "string"},
                 "auth": {"$ref": "#/$defs/httpauth"},
                 "type": {"type": "string", "enum": ["direct", "docker"]},
                 "exp_code": {"type": "array", "items": {"type": "number", "minimum": 0, "maximum": 999}}
