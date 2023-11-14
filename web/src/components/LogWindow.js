@@ -30,7 +30,7 @@ export default function LogWindow(props) {
     return <div>
         { loadingLog && !log &&
             <div className="text-center">
-                <Spinner nimation="border" role="status" variant="primary">
+                <Spinner animation="border" role="status" variant="primary">
                   <span className="visually-hidden">Loading...</span>
                 </Spinner>
             </div>
