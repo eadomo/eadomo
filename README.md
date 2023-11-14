@@ -207,6 +207,7 @@ You can also set environment variable `EADOMO_CONFIGURATION` with the content of
 |              |                     | type              |           |          | Check type: direct (from host) or docker                       |           | docker                |
 |              |                     | method            |           |          | Access method (GET, POST, etc.)                                |           | GET                   |
 |              |                     | data              |           |          | Data to send to the server (POST and PUT only)                 |           |                       |
+|              |                     | extra_headers     |           |          | Additional headers for the HTTP request (dictionary)           |           |                       |
 |              |                     | extra_curl_params |           |          | Additional parameters to pass to cURL                          |           |                       |
 | *list of ->* |                     | exp_code          |           |          | Expected HTTP return code                                      |           | 200                   |
 |              |                     | auth              |           |          | Authentication                                                 |           |                       |
