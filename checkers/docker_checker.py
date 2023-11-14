@@ -793,7 +793,7 @@ class DockerChecker(AbstractChecker):
                     bytes_read += x['value']
         cpu_delta = st['cpu_stats']['cpu_usage'].get('total_usage', 0) - \
                     st['precpu_stats']['cpu_usage']['total_usage']
-        system_cpu_delta = st['cpu_stats']['system_cpu_usage'] - st['precpu_stats']['system_cpu_usage']
+        system_cpu_delta = st['cpu_stats'].get('system_cpu_usage', 0) - st['precpu_stats'].get('system_cpu_usage', 0)
         number_cpus = st['cpu_stats']['online_cpus']
         cpu_usage = (cpu_delta / system_cpu_delta) * number_cpus
 
