@@ -468,11 +468,12 @@ class CheckServiceEndpointAvailable(AbstractCheck):
         url = self.endpoint['url']
         auth_curl_param = self.auth.get_curl_params() if self.auth else ''
         push_data = ''
+        extra_curl_params = self.endpoint.get('extra_curl_params', '')
         if self.push_data:
             push_data = f'-d {shlex.quote(self.push_data)}'
         try:
             logs = docker_client.containers.run("curlimages/curl",
-                                                f"-v -s -L -X {self.method} {push_data} {auth_curl_param} {url}",
+                                                f"-v -s -L -X {self.method} {push_data} {auth_curl_param} {extra_curl_params} {url}",
                                                 remove=True, stdout=True, stderr=True)
             logs = logs.decode('utf-8').split("\n")
             pattern = re.compile(r'^< HTTP/[0-9.]+\s+(\d+)\s+.*$')
