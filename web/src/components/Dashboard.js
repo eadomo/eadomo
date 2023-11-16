@@ -15,6 +15,8 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Form from 'react-bootstrap/Form';
 import Tabs from 'react-bootstrap/Tabs';import 'moment-timezone';
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from 'react-bootstrap/ToastContainer';
 import moment from 'moment';
 import Moment from 'react-moment';
 import { useNavigate } from "react-router-dom";
@@ -66,6 +68,8 @@ export default function Dashboard(props) {
     const [plotName, setPlotName] = useState(null);
     const [plotSourceType, setPlotSourceType] = useState(null);
     const [convFunc, setConvFunc] = useState(null);
+
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const transformStatus = (status) => {
         const name = status.name;
@@ -197,7 +201,15 @@ export default function Dashboard(props) {
             { "Content-Type": "multipart/form-data", withCredentials: true }
         )
         .then(x => forceUpdate())
-        .catch(e => console.log("error", e))
+        .catch(e => {
+          if (e.response?.status === 403) {
+            setErrorMessage('authentication failure: incorrect username or password');
+          } else {
+            setErrorMessage('authentication failure: error '+e.response.status);
+
+            console.log("error", e);
+          }
+        });
     }
 
     const logout = () => {
@@ -597,6 +609,16 @@ export default function Dashboard(props) {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer position="middle-center" style={{ zIndex: 1 }}>
+        <Toast delay={3000} autohide show={errorMessage != null} onClose={() => setErrorMessage(null)}>
+          <Toast.Header>
+            <strong>Error occurred</strong>
+          </Toast.Header>
+          <Toast.Body>
+            <Alert variant='danger'>{errorMessage}</Alert>
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
       <Container fluid>
           <Stack gap={3}>
                 <Stack direction="horizontal">
