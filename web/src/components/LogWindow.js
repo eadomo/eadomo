@@ -40,7 +40,7 @@ export default function LogWindow(props) {
         { log &&
         <React.Fragment>
         <Stack direction="horizontal" gap={3}>
-        <div className="shadow" style={{ background: 'black', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="shadow" style={{ background: 'black', overflowY: 'auto', maxHeight: 'calc(100vh - 200px)', width: '100%' }}>
             <div ref={topRef}/>
             <pre style={{ padding: '10px', textAlign: 'left', background: 'black', color: 'white' }}>
                 {log.truncated && "...\n"}
