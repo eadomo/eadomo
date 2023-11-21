@@ -14,3 +14,4 @@ pyOpenSSL
 mergedeep
 jsonschema
 pylint
+Werkzeug==2.3.7
